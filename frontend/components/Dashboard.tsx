@@ -36,8 +36,30 @@ export default function Dashboard({ data }: { data: AnalysisResult }) {
     // For MVP display, we map normalized risks back to the 'risks' const for rendering
     const risks = displayRisks;
 
+    const handleExport = () => {
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "contract_analysis.json";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     return (
         <div className="w-full max-w-5xl mx-auto space-y-6 pb-20">
+
+            {/* Action Bar */}
+            <div className="flex justify-end">
+                <button
+                    onClick={handleExport}
+                    className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-blue-600 transition-colors shadow-sm"
+                >
+                    <FileText className="w-4 h-4" />
+                    Export JSON
+                </button>
+            </div>
 
             {/* Summary Card */}
             <motion.div

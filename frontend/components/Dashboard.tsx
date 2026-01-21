@@ -11,15 +11,30 @@ interface Risk {
 
 interface AnalysisResult {
     summary: string;
-    risks: Risk[];
-    entities: any;
+    risks?: Risk[];
+    risk_flags?: string[]; // From new backend 
+    extracted_clauses?: Record<string, string>;
+    error?: string;
     raw_analysis?: string; // For prototype
+    entities?: any;
 }
 
 export default function Dashboard({ data }: { data: AnalysisResult }) {
-    // Fallback if data is raw string (prototype)
+    // Adapter to normalize backend response
     const summary = data.summary || "Summary not available.";
-    const risks = data.risks || [];
+
+    // If backend returns 'risks' (complex object) use it, otherwise convert risk_flags
+    let displayRisks: Risk[] = data.risks || [];
+    if (data.risk_flags && displayRisks.length === 0) {
+        displayRisks = data.risk_flags.map(flag => ({
+            clause: flag,
+            risk_level: "High", // Assume high for flagged ones in simplified mode
+            explanation: "Flagged by AI as potentially risky."
+        }));
+    }
+
+    // For MVP display, we map normalized risks back to the 'risks' const for rendering
+    const risks = displayRisks;
 
     return (
         <div className="w-full max-w-5xl mx-auto space-y-6 pb-20">

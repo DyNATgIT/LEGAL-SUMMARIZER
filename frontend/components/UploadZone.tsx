@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Upload, FileText, X, CheckCircle } from "lucide-react";
 import { useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
+import { summarizeContract } from "@/lib/apiClient";
 
 interface UploadZoneProps {
     onAnalysisComplete: (data: any) => void;
@@ -47,18 +48,12 @@ export default function UploadZone({ onAnalysisComplete }: UploadZoneProps) {
         if (!file) return;
 
         setIsAnalyzing(true);
-        const formData = new FormData();
-        formData.append("file", file);
-
         try {
-            const response = await fetch("http://localhost:8000/analyze", {
-                method: "POST",
-                body: formData,
-            });
-            const data = await response.json();
+            const data = await summarizeContract(file);
             onAnalysisComplete(data);
         } catch (error) {
             console.error("Analysis failed:", error);
+            alert("Analysis failed. Check console for details.");
         } finally {
             setIsAnalyzing(false);
         }

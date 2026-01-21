@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+google-cloud-aiplatform
+langchain
+python-multipart
+python-dotenv

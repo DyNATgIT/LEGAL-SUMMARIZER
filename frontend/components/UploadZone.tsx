@@ -51,9 +51,10 @@ export default function UploadZone({ onAnalysisComplete }: UploadZoneProps) {
         try {
             const data = await summarizeContract(file);
             onAnalysisComplete(data);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Analysis failed:", error);
-            alert("Analysis failed. Check console for details.");
+            // Show the exact error message to help debugging
+            alert(`Analysis failed: ${error.message}`);
         } finally {
             setIsAnalyzing(false);
         }

@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Upload, FileText, X, CheckCircle } from "lucide-react";
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { summarizeContract } from "@/lib/apiClient";
 
@@ -13,8 +13,6 @@ interface UploadZoneProps {
 export default function UploadZone({ onAnalysisComplete }: UploadZoneProps) {
     const [isDragging, setIsDragging] = useState(false);
     const [file, setFile] = useState<File | null>(null);
-    const [isAnalyzing, setIsAnalyzing] = useState(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleDrag = useCallback((e: React.DragEvent) => {
         e.preventDefault();
@@ -32,45 +30,21 @@ export default function UploadZone({ onAnalysisComplete }: UploadZoneProps) {
         setIsDragging(false);
 
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            const droppedFile = e.dataTransfer.files[0];
-            validateAndSetFile(droppedFile);
+            setFile(e.dataTransfer.files[0]);
         }
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            validateAndSetFile(e.target.files[0]);
+            setFile(e.target.files[0]);
         }
     };
 
-    const validateAndSetFile = (selectedFile: File) => {
-        const allowedExtensions = [".pdf", ".docx", ".doc", ".txt"];
-        const fileExtension = "." + selectedFile.name.split(".").pop()?.toLowerCase();
+    const removeFile = () => setFile(null);
 
-        if (allowedExtensions.includes(fileExtension)) {
-            setFile(selectedFile);
-        } else {
-            alert("Invalid file type. Please upload a PDF, DOCX, or TXT file.");
-            if (fileInputRef.current) {
-                fileInputRef.current.value = "";
-            }
-        }
-    }
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-    const triggerFileInput = () => {
-        fileInputRef.current?.click();
-    };
-
-    const removeFile = (e: React.MouseEvent) => {
-        e.stopPropagation(); // Prevent triggering click on parent
-        setFile(null);
-        if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-        }
-    };
-
-    const handleAnalyze = async (e: React.MouseEvent) => {
-        e.stopPropagation(); // Prevent triggering click on parent
+    const handleAnalyze = async () => {
         if (!file) return;
 
         setIsAnalyzing(true);
@@ -93,7 +67,6 @@ export default function UploadZone({ onAnalysisComplete }: UploadZoneProps) {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        onClick={triggerFileInput}
                         className={cn(
                             "relative group cursor-pointer flex flex-col items-center justify-center w-full h-64 rounded-3xl border-2 border-dashed transition-all duration-300 ease-out",
                             isDragging
@@ -105,13 +78,11 @@ export default function UploadZone({ onAnalysisComplete }: UploadZoneProps) {
                         onDragOver={handleDrag}
                         onDrop={handleDrop}
                     >
-                        {/* Hidden Input controlled via Ref */}
                         <input
-                            ref={fileInputRef}
                             type="file"
-                            className="hidden"
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                             onChange={handleChange}
-                        // Removing 'accept' attribute to speed up file dialog on Windows
+                            accept=".pdf,.docx,.doc,.txt"
                         />
 
                         <div className="relative z-10 flex flex-col items-center gap-4 text-center">

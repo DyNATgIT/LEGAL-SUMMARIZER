@@ -54,16 +54,22 @@ To deploy the backend, we use **Google Cloud Run**.
 ### Dockerfile (Backend) reference
 If you need a custom Dockerfile for the backend:
 
-```dockerfile
-# backend/Dockerfile
-FROM python:3.11-slim
+## 4. Free Deployment Option: Render (Backend) + Vercel (Frontend)
 
-WORKDIR /app
+For a **completely free** setup without requiring Google Cloud billing:
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+### Backend (Render)
+1.  Go to [render.com](https://render.com) and create a **Web Service**.
+2.  Connect your GitHub repo.
+3.  **Root Directory**: `backend`
+4.  **Runtime**: Python 3
+5.  **Build Command**: `pip install -r requirements.txt`
+6.  **Start Command**: `uvicorn main:app --host 0.0.0.0 --port 10000`
+7.  **Environment Variables**:
+    -   `GEMINI_API_KEY`: Get this from [Google AI Studio](https://aistudio.google.com/app/apikey) (Free).
+    -   `PYTHON_VERSION`: `3.11.0` (Optional, good practice).
+8.  **Deploy**.
 
-COPY . .
+### Frontend (Vercel)
+Follow the standard Vercel steps above, but set `NEXT_PUBLIC_API_URL` to your new Render URL (e.g., `https://legal-summarizer.onrender.com`).
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
-```

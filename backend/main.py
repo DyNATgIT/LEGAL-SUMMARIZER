@@ -11,15 +11,19 @@ app = FastAPI(title="Legal Summarizer API")
 # ------------------------------------------------------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[
+        "*"
+    ],  # Allow all origins for the MVP (simplifies Vercel/Render connection)
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+
 @app.get("/")
 def health_check():
     return {"status": "ok", "message": "Legal Summarizer API is running"}
+
 
 @app.post("/api/summarize")
 async def summarize_contract_endpoint(file: UploadFile = File(...)):
@@ -38,13 +42,14 @@ async def summarize_contract_endpoint(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"Failed to read file: {e}")
 
     analysis = analyze_contract_text(text)
-    
+
     # Check for error in analysis result
     if "error" in analysis:
-         # If it's a configuration error (missing ID), we still return 200 with the error displayed in JSON for the prototype
-         pass
+        # If it's a configuration error (missing ID), we still return 200 with the error displayed in JSON for the prototype
+        pass
 
     return JSONResponse(content=analysis)
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

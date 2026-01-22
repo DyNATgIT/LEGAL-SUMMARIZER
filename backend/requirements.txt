@@ -1,6 +1,5 @@
 fastapi
 uvicorn
-google-cloud-aiplatform
-langchain
+google-generativeai
 python-multipart
 python-dotenv

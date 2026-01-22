@@ -2,7 +2,9 @@ export async function summarizeContract(file: File) {
     const form = new FormData();
     form.append("file", file);
 
-    const res = await fetch("http://localhost:8000/api/summarize", {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+    const res = await fetch(`${API_URL}/api/summarize`, {
         method: "POST",
         body: form,
     });

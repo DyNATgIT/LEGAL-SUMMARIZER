@@ -7,10 +7,15 @@ export async function summarizeContract(file: File) {
         API_URL = API_URL.slice(0, -1);
     }
 
+    console.log("API URL:", API_URL); // Debug log
+
     try {
         const res = await fetch(`${API_URL}/api/summarize`, {
             method: "POST",
             body: form,
+            headers: {
+                // Don't set Content-Type - browser will set it with boundary for FormData
+            },
         });
 
         if (!res.ok) {
@@ -20,6 +25,7 @@ export async function summarizeContract(file: File) {
         return res.json();
     } catch (error) {
         console.error("API Call Failed:", error);
+        console.error("Error details:", error instanceof Error ? error.message : String(error));
         throw error;
     }
 }

@@ -7,11 +7,20 @@ from services.ai_service import analyze_contract_text
 app = FastAPI(title="Legal Summarizer API")
 
 # ------------------------------------------------------------------
-# CORS (for local dev)
+# CORS (for local dev and production)
 # ------------------------------------------------------------------
+import os
+
+# Allow all origins in production for now (or use ALLOWED_ORIGINS env var)
+allowed_origins_str = os.getenv("ALLOWED_ORIGINS", "*")
+if allowed_origins_str == "*":
+    allow_origins = ["*"]
+else:
+    allow_origins = [origin.strip() for origin in allowed_origins_str.split(",")]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=allow_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

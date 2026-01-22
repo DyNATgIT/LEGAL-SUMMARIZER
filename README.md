@@ -114,8 +114,3 @@ Distributed under the MIT License. See `LICENSE` for more information.
 Project Link: [https://github.com/DyNATgIT/LEGAL-SUMMARIZER](https://github.com/DyNATgIT/LEGAL-SUMMARIZER)
 ```
 
-### Checklist to finalize this README:
-1.  **Tech Stack:** Update the "NLP Engine" and "Frontend" sections with what you actually used (e.g., if you used `transformers`, write that. If you used `LangChain`, write that).
-2.  **Run Command:** Ensure `app.py` is the actual name of your main script. If it's `main.py` or `server.py`, update the Installation section.
-3.  **Screenshots:** If you have an image of the tool running, put it in a folder named `assets` and link it in the screenshot section. If not, delete that section.
-

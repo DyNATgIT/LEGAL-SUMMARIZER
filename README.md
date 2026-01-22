@@ -14,18 +14,19 @@
 - **Abstractive Summarization:** Generates human-readable summaries rather than just extracting sentences.
 - **Key Entity Extraction:** Identifies parties involved, dates, and monetary amounts.
 - **Customizable Length:** Choose between Short, Medium, or Detailed summaries.
-- **User-Friendly Interface:** Built with [Streamlit / Flask / React] for easy interaction.
+- **User-Friendly Interface:** Built with React for easy interaction.
 
 ## 🛠️ Tech Stack
 
-- **Language:** Python
-- **NLP Engine:** [e.g., OpenAI GPT-4 / LangChain / Hugging Face Bart-Large-CNN / Spacy]
-- **Frontend/UI:** [e.g., Streamlit / HTML & CSS]
+- **Language:** Python ,TYPESCRIPT,JAVASCRIPT
+- **NLP Engine:** VERTEX AI ,ANTIGRAVITY ,GEMINI 3 PRO
+- **Frontend/UI:** NEXTJS
 - **PDF Processing:** [e.g., PyPDF2 / PDFMiner]
 
 ## 📸 Screenshots
 
-*[Insert a screenshot of your application interface here]*
+<img width="1918" height="882" alt="image" src="https://github.com/user-attachments/assets/05be0bb9-e0db-456d-84ff-e9e93afb4311" />
+
 
 ## 📦 Installation
 
@@ -33,7 +34,7 @@ Follow these steps to set up the project locally.
 
 ### Prerequisites
 - Python 3.8 or higher
-- [Optional: OpenAI API Key if using GPT models]
+- GEMINI3 PRO AI API Key
 
 ### Steps
 
@@ -59,10 +60,10 @@ Follow these steps to set up the project locally.
    pip install -r requirements.txt
    ```
 
-4. **Environment Variables**
-   If you are using an external API (like OpenAI), create a `.env` file in the root directory:
+4. **Environment Variables USING GEMINI 3 PRO**
+   create a `.env` file in the root directory:
    ```env
-   OPENAI_API_KEY=your_api_key_here
+   GEMINI3PRO_API_KEY=your_api_key_here
    ```
 
 5. **Run the Application**
@@ -111,6 +112,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 **DyNATgIT** - [GitHub Profile](https://github.com/DyNATgIT)
 
-Project Link: [https://github.com/DyNATgIT/LEGAL-SUMMARIZER](https://github.com/DyNATgIT/LEGAL-SUMMARIZER)
+Project Link: https://legal-contract-summarizer.vercel.app/
 ```
+
 

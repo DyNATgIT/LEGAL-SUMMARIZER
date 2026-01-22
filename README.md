@@ -1,13 +1,4 @@
-Based on the repository name (`LEGAL-SUMMARIZER`) and common practices for projects of this nature, I have drafted a professional, comprehensive `README.md`.
-
-Since I cannot see the specific code files (to know if you are using Streamlit, Flask, Django, OpenAI, or HuggingFace), **I have used placeholders (bracketed text like `[this]`)** where you should insert your specific details.
-
-Here is the Markdown code. You can copy this directly into your repository.
-
-***
-
-```markdown
-# ⚖️ Legal Summarizer
+⚖️ Legal Summarizer
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
@@ -127,3 +118,4 @@ Project Link: [https://github.com/DyNATgIT/LEGAL-SUMMARIZER](https://github.com/
 1.  **Tech Stack:** Update the "NLP Engine" and "Frontend" sections with what you actually used (e.g., if you used `transformers`, write that. If you used `LangChain`, write that).
 2.  **Run Command:** Ensure `app.py` is the actual name of your main script. If it's `main.py` or `server.py`, update the Installation section.
 3.  **Screenshots:** If you have an image of the tool running, put it in a folder named `assets` and link it in the screenshot section. If not, delete that section.
+

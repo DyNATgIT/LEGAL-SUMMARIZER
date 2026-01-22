@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LegalEase - AI Contract Summarizer & Risk Highlighter</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-text {
+            background: linear-gradient(to right, #2563eb, #9333ea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .highlight-risk-high {
+            background-color: #fee2e2;
+            border-left: 4px solid #ef4444;
+        }
+        .highlight-risk-medium {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+        }
+        .highlight-risk-low {
+            background-color: #dbeafe;
+            border-left: 4px solid #3b82f6;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <i class="fa-solid fa-scale-balanced text-blue-600 text-2xl mr-3"></i>
+                    <span class="font-bold text-xl tracking-tight">Legal<span class="text-blue-600">Ease</span> AI</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-slate-500 hidden md:block">Powered by Simulated Vertex AI</span>
+                    <button class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-md text-sm font-medium transition">
+                        Log In
+                    </button>
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition">
+                        Get Started
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        
+        <!-- Hero Section -->
+        <section class="bg-white pb-12 pt-10 border-b border-slate-200" id="upload-section">
+            <div class="max-w-4xl mx-auto px-4 text-center">
+                <h1 class="text-4xl md:text-5xl font-extrabold mb-6">
+                    Contract Review at <span class="gradient-text">Lightning Speed</span>
+                </h1>
+                <p class="text-lg text-slate-600 mb-10 max-w-2xl mx-auto">
+                    Upload contracts to get concise plain-language summaries, key clause extractions, and AI-highlighted risk areas instantly.
+                </p>
+
+                <!-- Input Area -->
+                <div class="bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+                        <div class="flex space-x-4">
+                            <button id="tab-paste" class="text-blue-600 font-semibold border-b-2 border-blue-600 pb-1">Paste Text</button>
+                            <button id="tab-upload" class="text-slate-500 hover:text-slate-700 pb-1">Upload File</button>
+                        </div>
+                        <div class="text-xs text-slate-400">
+                            <i class="fa-solid fa-lock mr-1"></i> Secure & Private
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <textarea id="contract-text" rows="10" class="w-full p-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none font-mono text-sm resize-y" placeholder="Paste your legal contract text here... (e.g., NDA, Service Agreement)"></textarea>
+                        
+                        <div id="file-drop-area" class="hidden border-2 border-dashed border-slate-300 rounded-lg p-12 text-center hover:bg-slate-50 transition cursor-pointer">
+                            <i class="fa-solid fa-cloud-arrow-up text-4xl text-slate-400 mb-4"></i>
+                            <p class="text-slate-600 font-medium">Click to upload or drag and drop</p>
+                            <p class="text-slate-400 text-sm mt-1">PDF, DOCX, or TXT (Max 10MB)</p>
+                            <input type="file" id="file-input" class="hidden" accept=".pdf,.docx,.txt" onchange="handleFileInput(this)">
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 px-6 py-4 border-t border-slate-200 flex justify-end">
+                        <button onclick="fillSample()" class="mr-auto text-sm text-slate-500 hover:text-blue-600 underline">
+                            Use Sample NDA
+                        </button>
+                        <button onclick="analyzeContract()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition shadow-md flex items-center">
+                            <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Analyze Contract
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mt-8 flex justify-center space-x-8 text-slate-400 grayscale opacity-70">
+                    <!-- Tech Stack Icons (Visual only) -->
+                    <div class="flex items-center"><i class="fa-brands fa-google text-xl mr-2"></i> Vertex AI</div>
+                    <div class="flex items-center"><i class="fa-solid fa-file-contract text-xl mr-2"></i> Document AI</div>
+                    <div class="flex items-center"><i class="fa-solid fa-shield-halved text-xl mr-2"></i> Enterprise Grade</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loading State (Hidden by default) -->
+        <section id="loading-state" class="hidden py-20 text-center">
+            <div class="flex flex-col items-center justify-center">
+                <div class="loading-spinner mb-6"></div>
+                <h3 class="text-xl font-semibold text-slate-800">Analyzing Contract...</h3>
+                <p class="text-slate-500 mt-2">Extracting clauses and identifying risks via Vertex AI</p>
+                <div class="w-64 bg-slate-200 rounded-full h-2.5 mt-6 overflow-hidden">
+                    <div class="bg-blue-600 h-2.5 rounded-full animate-[width_2s_ease-in-out_infinite]" style="width: 45%"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Dashboard (Hidden by default) -->
+        <section id="results-dashboard" class="hidden bg-slate-50 min-h-screen pb-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                
+                <!-- Dashboard Header -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-8">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800">Analysis Report</h2>
+                        <p class="text-slate-500 text-sm">Generated on <span id="current-date"></span></p>
+                    </div>
+                    <div class="mt-4 md:mt-0 flex space-x-3">
+                        <button onclick="resetApp()" class="px-4 py-2 bg-white border border-slate-300 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-50">
+                            Analyze Another
+                        </button>
+                        <button onclick="window.print()" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 shadow-sm transition">
+                            <i class="fa-solid fa-download mr-1"></i> Export Report
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Grid Layout -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Left Column: Summary & Stats -->
+                    <div class="lg:col-span-1 space-y-8">
+                        <!-- Score Card -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Risk Score</h3>
+                            <div class="flex items-center justify-center">
+                                <div class="relative w-32 h-32">
+                                    <svg class="w-full h-full" viewBox="0 0 36 36">
+                                        <path class="text-slate-200" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
+                                        <path id="risk-circle" class="text-orange-500" stroke-dasharray="70, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
+                                    </svg>
+                                    <div class="absolute inset-0 flex items-center justify-center flex-col">
+                                        <span class="text-3xl font-bold text-slate-800" id="risk-score">Medium</span>
+                                        <span class="text-xs text-slate-500">Risk Level</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-6 grid grid-cols-2 gap-4 text-center">
+                                <div class="bg-red-50 p-2 rounded-lg">
+                                    <div class="text-xl font-bold text-red-600" id="high-risk-count">0</div>
+                                    <div class="text-xs text-red-600">High Risks</div>
+                                </div>
+                                <div class="bg-yellow-50 p-2 rounded-lg">
+                                    <div class="text-xl font-bold text-yellow-600" id="medium-risk-count">0</div>
+                                    <div class="text-xs text-yellow-600">Warnings</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Summary Card -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Executive Summary</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed" id="summary-text">
+                                The AI is generating a summary...
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Detailed Analysis -->
+                    <div class="lg:col-span-2 space-y-8">
+                        
+                        <!-- Tabs -->
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                            <div class="border-b border-slate-200 flex" id="result-tabs">
+                                <button onclick="switchResultTab('risks')" id="tab-btn-risks" class="flex-1 px-4 py-4 text-sm font-medium text-blue-600 border-b-2 border-blue-600 focus:outline-none bg-blue-50/50 transition">
+                                    Risk Analysis
+                                </button>
+                                <button onclick="switchResultTab('clauses')" id="tab-btn-clauses" class="flex-1 px-4 py-4 text-sm font-medium text-slate-500 hover:text-slate-700 focus:outline-none hover:bg-slate-50 transition">
+                                    Key Clauses
+                                </button>
+                                <button onclick="switchResultTab('redlines')" id="tab-btn-redlines" class="flex-1 px-4 py-4 text-sm font-medium text-slate-500 hover:text-slate-700 focus:outline-none hover:bg-slate-50 transition">
+                                    Redline Suggestions
+                                </button>
+                            </div>
+                            
+                            <!-- Tab Contents -->
+                            <div class="p-6 relative min-h-[300px]">
+                                <!-- Risk Analysis Content -->
+                                <div id="content-risks" class="space-y-4 animate-fade-in">
+                                    <!-- Risks will be injected here -->
+                                </div>
+
+                                <!-- Key Clauses Content -->
+                                <div id="content-clauses" class="hidden space-y-4 animate-fade-in">
+                                    <!-- Clauses will be injected here -->
+                                </div>
+
+                                <!-- Redlines Content -->
+                                <div id="content-redlines" class="hidden space-y-4 animate-fade-in">
+                                    <!-- Redlines will be injected here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Extracted Data Preview (Bottom) -->
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                            <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Clause Explorer</h3>
+                            <div class="h-64 overflow-y-auto p-4 bg-slate-50 border border-slate-200 rounded-lg font-mono text-xs text-slate-600 whitespace-pre-wrap" id="contract-view">
+                                <!-- Full text with highlights -->
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-slate-400 text-sm mb-2">
+                &copy; 2023 LegalEase AI. All rights reserved.
+            </p>
+            <p class="text-slate-400 text-xs max-w-2xl mx-auto">
+                <strong>Disclaimer:</strong> This tool is for demonstration purposes only. The summaries and risk highlights are generated by an AI simulation and should not be considered legal advice. Always consult with a qualified attorney for legal review.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // --- State ---
+        const sampleNDA = `NON-DISCLOSURE AGREEMENT
+
+This Non-Disclosure Agreement (the "Agreement") is entered into by and between [Party A] ("Disclosing Party") and [Party B] ("Receiving Party") for the purpose of preventing the unauthorized disclosure of Confidential Information as defined below.
+
+1. Definition of Confidential Information. "Confidential Information" shall include all information or material that has or could have commercial value or other utility in the business in which Disclosing Party is engaged.
+
+2. Obligations of Receiving Party. Receiving Party shall hold and maintain the Confidential Information in strictest confidence for the sole and exclusive benefit of the Disclosing Party. Receiving Party shall carefully restrict access to Confidential Information to employees, contractors, and third parties as is reasonably required.
+
+3. Time Periods. The nondisclosure provisions of this Agreement shall survive the termination of this Agreement and Receiving Party's duty to hold Confidential Information in confidence shall remain in effect until the Confidential Information no longer qualifies as a trade secret or until Disclosing Party sends Receiving Party written notice releasing Receiving Party from this Agreement, whichever occurs first.
+
+4. Indemnification. Receiving Party agrees to indemnify, defend, and hold harmless Disclosing Party against any and all losses, damages, claims, or expenses arising out of or in connection with any unauthorized use or disclosure of Confidential Information.
+
+5. Termination. This Agreement may be terminated by either party at any time upon written notice to the other party. Upon termination, Receiving Party shall return all records, notes, and other written, printed, or tangible materials in its possession pertaining to Confidential Information.
+
+6. Jurisdiction. This Agreement shall be governed in accordance with the laws of the State of California.
+
+7. Liability. IN NO EVENT SHALL EITHER PARTY BE LIABLE FOR ANY INDIRECT, SPECIAL, OR CONSEQUENTIAL DAMAGES.`;
+
+        // --- UI Logic ---
+        const tabPaste = document.getElementById('tab-paste');
+        const tabUpload = document.getElementById('tab-upload');
+        const textArea = document.getElementById('contract-text');
+        const fileDropArea = document.getElementById('file-drop-area');
+
+        tabPaste.addEventListener('click', () => {
+            tabPaste.classList.add('text-blue-600', 'border-b-2', 'border-blue-600', 'font-semibold');
+            tabPaste.classList.remove('text-slate-500');
+            tabUpload.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600', 'font-semibold');
+            tabUpload.classList.add('text-slate-500');
+            
+            textArea.classList.remove('hidden');
+            fileDropArea.classList.add('hidden');
+        });
+
+        tabUpload.addEventListener('click', () => {
+            tabUpload.classList.add('text-blue-600', 'border-b-2', 'border-blue-600', 'font-semibold');
+            tabUpload.classList.remove('text-slate-500');
+            tabPaste.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600', 'font-semibold');
+            tabPaste.classList.add('text-slate-500');
+
+            textArea.classList.add('hidden');
+            fileDropArea.classList.remove('hidden');
+        });
+
+        // Drag and Drop Logic
+        fileDropArea.addEventListener('click', () => document.getElementById('file-input').click());
+        
+        fileDropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileDropArea.classList.add('bg-blue-50', 'border-blue-400');
+        });
+
+        fileDropArea.addEventListener('dragleave', () => {
+            fileDropArea.classList.remove('bg-blue-50', 'border-blue-400');
+        });
+
+        fileDropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileDropArea.classList.remove('bg-blue-50', 'border-blue-400');
+            
+            // Simulation: Just assume it worked and use sample text, or read text if it's a txt file
+            if (e.dataTransfer.files.length > 0) {
+                const file = e.dataTransfer.files[0];
+                handleFile(file);
+            }
+        });
+
+        function handleFileInput(input) {
+            if (input.files.length > 0) {
+                handleFile(input.files[0]);
+            }
+        }
+
+        function handleFile(file) {
+            // Update UI to show file name
+            fileDropArea.innerHTML = `
+                <i class="fa-solid fa-file-lines text-4xl text-blue-600 mb-4"></i>
+                <p class="text-slate-800 font-medium">${file.name}</p>
+                <p class="text-slate-500 text-sm mt-1">Ready to analyze</p>
+                <button onclick="event.stopPropagation(); resetFile()" class="mt-4 text-xs text-red-500 hover:underline z-10 relative">Remove</button>
+            `;
+        }
+
+        function resetFile() {
+             fileDropArea.innerHTML = `
+                <i class="fa-solid fa-cloud-arrow-up text-4xl text-slate-400 mb-4"></i>
+                <p class="text-slate-600 font-medium">Click to upload or drag and drop</p>
+                <p class="text-slate-400 text-sm mt-1">PDF, DOCX, or TXT (Max 10MB)</p>
+                <input type="file" id="file-input" class="hidden" accept=".pdf,.docx,.txt" onchange="handleFileInput(this)">
+             `;
+        }
+
+        function fillSample() {
+            if (!textArea.classList.contains('hidden')) {
+                textArea.value = sampleNDA;
+            } else {
+                alert("Please switch to 'Paste Text' tab to see the sample text.");
+                tabPaste.click();
+                textArea.value = sampleNDA;
+            }
+        }
+
+        function analyzeContract() {
+            let text = textArea.value;
+            if (textArea.classList.contains('hidden')) {
+                text = sampleNDA;
+            }
+
+            if (!text.trim()) {
+                alert("Please enter contract text or upload a file.");
+                return;
+            }
+
+            document.getElementById('upload-section').classList.add('hidden');
+            document.getElementById('loading-state').classList.remove('hidden');
+
+            setTimeout(() => {
+                processText(text);
+                document.getElementById('loading-state').classList.add('hidden');
+                document.getElementById('results-dashboard').classList.remove('hidden');
+            }, 2000);
+        }
+
+        function resetApp() {
+            document.getElementById('results-dashboard').classList.add('hidden');
+            document.getElementById('upload-section').classList.remove('hidden');
+            textArea.value = "";
+            switchResultTab('risks');
+        }
+
+        // --- Tab Switching Logic ---
+        function switchResultTab(tabName) {
+            // Reset Buttons
+            ['risks', 'clauses', 'redlines'].forEach(t => {
+                const btn = document.getElementById(`tab-btn-${t}`);
+                const content = document.getElementById(`content-${t}`);
+                
+                if (t === tabName) {
+                    btn.classList.add('text-blue-600', 'border-b-2', 'border-blue-600', 'bg-blue-50/50');
+                    btn.classList.remove('text-slate-500', 'hover:bg-slate-50');
+                    content.classList.remove('hidden');
+                } else {
+                    btn.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600', 'bg-blue-50/50');
+                    btn.classList.add('text-slate-500', 'hover:bg-slate-50');
+                    content.classList.add('hidden');
+                }
+            });
+        }
+
+        // --- Core Logic (Simulated AI) ---
+        function processText(text) {
+            document.getElementById('current-date').innerText = new Date().toLocaleDateString();
+
+            const risks = [];
+            const clauses = [];
+            const redlines = [];
+            
+            // 1. Indemnification
+            if (text.toLowerCase().includes('indemnify') || text.toLowerCase().includes('indemnification')) {
+                const context = findContext(text, 'indemnify');
+                risks.push({
+                    type: 'Indemnification',
+                    level: 'High',
+                    description: 'Clause found requiring one party to cover losses of the other. This creates significant financial exposure.',
+                    context: context
+                });
+                clauses.push({
+                    title: 'Indemnification',
+                    text: context
+                });
+                redlines.push({
+                    original: context,
+                    suggestion: 'Add "mutual" to indemnification obligations so both parties are protected. Limit to "direct damages" only.',
+                    reason: 'Reduces one-sided risk.'
+                });
+            }
+
+            // 2. Liability
+            if (text.toLowerCase().includes('consequential damages') || text.toLowerCase().includes('liability')) {
+                const context = findContext(text, 'liability') || findContext(text, 'damages');
+                risks.push({
+                    type: 'Limitation of Liability',
+                    level: 'Medium',
+                    description: 'Limits on liability detected. Ensure these caps are mutual and reasonable.',
+                    context: context
+                });
+                clauses.push({
+                    title: 'Liability Cap',
+                    text: context
+                });
+                redlines.push({
+                    original: context,
+                    suggestion: 'Ensure the liability cap is at least 12 months of fees paid. Carve out "Gross Negligence" from the cap.',
+                    reason: 'Standard protection for Service Provider.'
+                });
+            }
+
+            // 3. Termination
+            if (text.toLowerCase().includes('termination')) {
+                const context = findContext(text, 'termination');
+                risks.push({
+                    type: 'Termination',
+                    level: 'Medium',
+                    description: 'Review termination for convenience clauses. Ensure notice periods are adequate.',
+                    context: context
+                });
+                clauses.push({
+                    title: 'Termination Rights',
+                    text: context
+                });
+                redlines.push({
+                    original: context,
+                    suggestion: 'Increase notice period from "immediate" to "30 days written notice" to allow for orderly wind-down.',
+                    reason: 'Operational stability.'
+                });
+            }
+
+             // 4. Jurisdiction
+             if (text.toLowerCase().includes('jurisdiction') || text.toLowerCase().includes('governing law')) {
+                const context = findContext(text, 'jurisdiction') || findContext(text, 'law');
+                risks.push({
+                    type: 'Jurisdiction',
+                    level: 'Low',
+                    description: 'Check if the governing law jurisdiction is favorable or neutral.',
+                    context: context
+                });
+                clauses.push({
+                    title: 'Governing Law',
+                    text: context
+                });
+            }
+
+            // Default fallback
+            if (risks.length === 0) {
+                risks.push({
+                    type: 'General Review',
+                    level: 'Low',
+                    description: 'No specific high-risk keywords detected, but manual review is always recommended.',
+                    context: text.substring(0, 100) + '...'
+                });
+                clauses.push({
+                    title: 'General Terms',
+                    text: text.substring(0, 200) + '...'
+                });
+            }
+
+            // --- Stats Update ---
+            const highCount = risks.filter(r => r.level === 'High').length;
+            const medCount = risks.filter(r => r.level === 'Medium').length;
+            
+            document.getElementById('high-risk-count').innerText = highCount;
+            document.getElementById('medium-risk-count').innerText = medCount;
+
+            const riskScoreEl = document.getElementById('risk-score');
+            const riskCircle = document.getElementById('risk-circle');
+            
+            if (highCount > 0) {
+                riskScoreEl.innerText = "High";
+                riskScoreEl.className = "text-3xl font-bold text-red-600";
+                riskCircle.classList.remove('text-orange-500', 'text-blue-500');
+                riskCircle.classList.add('text-red-500');
+            } else if (medCount > 0) {
+                riskScoreEl.innerText = "Medium";
+                riskScoreEl.className = "text-3xl font-bold text-orange-600";
+                riskCircle.classList.remove('text-red-500', 'text-blue-500');
+                riskCircle.classList.add('text-orange-500');
+            } else {
+                riskScoreEl.innerText = "Low";
+                riskScoreEl.className = "text-3xl font-bold text-blue-600";
+                riskCircle.classList.remove('text-red-500', 'text-orange-500');
+                riskCircle.classList.add('text-blue-500');
+            }
+
+            // --- Summary ---
+            const summary = `This agreement appears to be a ${detectType(text)}. It outlines obligations for confidentiality, defines the scope of information protected, and sets terms for ${risks.map(r => r.type.toLowerCase()).join(', ')}. Key obligations include maintaining strict confidence and restricting access to authorized personnel only.`;
+            document.getElementById('summary-text').innerText = summary;
+
+            // --- Render: Risks ---
+            const riskContainer = document.getElementById('content-risks');
+            riskContainer.innerHTML = '';
+            risks.forEach(risk => {
+                const colorClass = risk.level === 'High' ? 'highlight-risk-high' : (risk.level === 'Medium' ? 'highlight-risk-medium' : 'highlight-risk-low');
+                const badgeClass = risk.level === 'High' ? 'bg-red-100 text-red-800' : (risk.level === 'Medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800');
+                
+                riskContainer.innerHTML += `
+                    <div class="${colorClass} p-4 rounded-r-lg bg-white border border-slate-100 shadow-sm">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-slate-800">${risk.type}</h4>
+                            <span class="${badgeClass} text-xs font-semibold px-2.5 py-0.5 rounded">${risk.level}</span>
+                        </div>
+                        <p class="text-sm text-slate-600 mb-3">${risk.description}</p>
+                        <div class="bg-slate-50 p-3 rounded text-xs font-mono text-slate-500 border border-slate-200">
+                            "${risk.context}"
+                        </div>
+                    </div>
+                `;
+            });
+
+            // --- Render: Clauses ---
+            const clauseContainer = document.getElementById('content-clauses');
+            clauseContainer.innerHTML = '';
+            clauses.forEach(clause => {
+                clauseContainer.innerHTML += `
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm hover:border-blue-300 transition">
+                        <h4 class="font-semibold text-blue-800 mb-2">${clause.title}</h4>
+                        <p class="text-sm text-slate-600 font-mono bg-slate-50 p-2 rounded">"${clause.text}"</p>
+                    </div>
+                `;
+            });
+
+            // --- Render: Redlines ---
+            const redlineContainer = document.getElementById('content-redlines');
+            redlineContainer.innerHTML = '';
+            if (redlines.length === 0) {
+                 redlineContainer.innerHTML = `<div class="text-center text-slate-500 p-8">No major redlines suggested for this document.</div>`;
+            }
+            redlines.forEach(rl => {
+                redlineContainer.innerHTML += `
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+                        <div class="mb-3">
+                            <span class="text-xs font-bold text-slate-400 uppercase">Original Text</span>
+                            <div class="text-xs text-red-400 line-through mt-1 font-mono">"${rl.original}"</div>
+                        </div>
+                        <div class="mb-3">
+                             <span class="text-xs font-bold text-slate-400 uppercase">Suggested Revision</span>
+                             <div class="text-sm text-green-600 font-medium mt-1">"${rl.suggestion}"</div>
+                        </div>
+                         <div class="flex items-center text-xs text-slate-500 bg-slate-50 p-2 rounded">
+                            <i class="fa-solid fa-lightbulb text-yellow-500 mr-2"></i>
+                            Why? ${rl.reason}
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Update Contract View
+            document.getElementById('contract-view').innerText = text;
+        }
+
+        function findContext(text, keyword) {
+            const index = text.toLowerCase().indexOf(keyword);
+            if (index === -1) return null;
+            const start = Math.max(0, index - 50);
+            const end = Math.min(text.length, index + 150);
+            return (start > 0 ? '...' : '') + text.substring(start, end) + (end < text.length ? '...' : '');
+        }
+
+        function detectType(text) {
+            if (text.toLowerCase().includes('non-disclosure') || text.toLowerCase().includes('confidentiality')) return "Non-Disclosure Agreement (NDA)";
+            if (text.toLowerCase().includes('service') && text.toLowerCase().includes('agreement')) return "Service Agreement";
+            if (text.toLowerCase().includes('employment')) return "Employment Contract";
+            return "General Legal Contract";
+        }
+    </script>
+</body>
+</html>

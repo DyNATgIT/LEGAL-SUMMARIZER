@@ -116,3 +116,4 @@ Project Link: https://legal-contract-summarizer.vercel.app/
 
 
 
+

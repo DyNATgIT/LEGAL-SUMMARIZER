@@ -21,7 +21,6 @@
 - **Language:** Python ,TYPESCRIPT,JAVASCRIPT
 - **NLP Engine:** VERTEX AI ,ANTIGRAVITY ,GEMINI 3 PRO
 - **Frontend/UI:** NEXTJS
-- **PDF Processing:** [e.g., PyPDF2 / PDFMiner]
 
 ## 📸 Screenshots
 
@@ -114,5 +113,6 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 Project Link: https://legal-contract-summarizer.vercel.app/
 ```
+
 
 
